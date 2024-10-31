@@ -8,6 +8,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.sergiospinola.common.designsystem.theme.AppTheme
+import com.sergiospinola.feature.home.navigation.HOME_NAVIGATION_ROUTE
+import com.sergiospinola.feature.home.navigation.homeScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -21,19 +23,11 @@ fun MainCompose(
 
     NavHost(
         navController = navController,
-        startDestination = "HOME_FEATURE_NAVIGATION_ROUTE"
+        startDestination = HOME_NAVIGATION_ROUTE
     ) {
-//        homeSection(
-//            navController,
-//            navigateToCreateProduct = {
-//                navController.navigateToCreateProduct()
-//            },
-//            navigateToDetail = navController::navigateToDetail,
-//            navigateToProfile = navController::navigateToProfile,
-//            navigateToLogin = navController::navigateToLogin,
-//            navigateToBecomePro = navController::navigateToBecomePro,
-//            navigateToFilter = navController::navigateToFilter
-//        )
+        homeScreen(
+            navController,
+        )
     }
 }
 

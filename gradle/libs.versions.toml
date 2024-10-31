@@ -7,8 +7,11 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
+composeCompiler = "1.5.8"
 material = "1.12.0"
 hilt = "2.51.1"
+retrofit = "2.11.0"
+okhttp = "4.12.0"
 accompanist = "0.34.0"
 
 [libraries]
@@ -24,6 +27,13 @@ tools-timber = "com.jakewharton.timber:timber:5.0.1"
 hilt-core = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
+
+retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+
+okhttp-bom  = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp" }
+okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "retrofit" }
+okhttp-log  = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "retrofit" }
 
 compose-activity = "androidx.activity:activity-compose:1.9.3"
 compose-bom = "androidx.compose:compose-bom:2024.10.01"

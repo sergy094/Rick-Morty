@@ -50,4 +50,10 @@ dependencies {
     // Dagger/Hilt
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
+
+    // Compose
+    implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.compose)
+    implementation(libs.compose.accompanist)
+    implementation(libs.compose.uiTooling)
 }

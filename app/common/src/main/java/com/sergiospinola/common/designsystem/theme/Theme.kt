@@ -16,6 +16,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
     secondary = SecondaryColor,
+    background = BackgroundAppColor,
     surface = Color.White,
     surfaceTint = Color.White,
 )
