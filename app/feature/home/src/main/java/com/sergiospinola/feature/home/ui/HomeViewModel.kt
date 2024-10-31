@@ -2,6 +2,7 @@ package com.sergiospinola.feature.home.ui
 
 import com.sergiospinola.common.base.BaseViewModel
 import com.sergiospinola.common.base.BaseViewModelInterface
+import com.sergiospinola.data.model.CharacterListData
 import com.sergiospinola.data.repository.APIRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,12 +30,32 @@ class HomeScreenViewModel @Inject constructor(
     override fun handle(event: HomeScreenEvent) {
         when (event) {
             HomeScreenEvent.DidNavigate -> didNavigate()
+            HomeScreenEvent.OnNextPressed -> getCharacters(_homeScreenUiState.value.nextPage)
+            HomeScreenEvent.OnPreviousPressed -> getCharacters(_homeScreenUiState.value.previousPage)
         }
     }
 
     init {
+        getCharacters()
+    }
+
+    private fun getPageFromUrl(url: String?) =
+        url?.substringAfter("page=")
+            ?.substringBefore("&")?.toIntOrNull()
+
+    private fun getCharacters(page: Int? = null) {
         launchWithErrorWrapper {
-            repository.getAllCharacters()
+            val charactersResponse = repository.getAllCharacters(page)
+            val characters = charactersResponse.results
+            val nextPage = getPageFromUrl(charactersResponse.info.next)
+            val previousPage = getPageFromUrl(charactersResponse.info.prev)
+            _homeScreenUiState.update {
+                it.copy(
+                    characters = characters,
+                    nextPage = nextPage,
+                    previousPage = previousPage
+                )
+            }
         }
     }
 
@@ -50,12 +71,16 @@ class HomeScreenViewModel @Inject constructor(
 }
 
 data class HomeScreenUiState(
-    val yourData: String? = null,
+    val characters: List<CharacterListData> = emptyList(),
+    val nextPage: Int? = null,
+    val previousPage: Int? = null,
     val navigation: HomeScreenNavigation? = null,
 )
 
 sealed interface HomeScreenNavigation {}
 
 sealed interface HomeScreenEvent {
+    object OnNextPressed : HomeScreenEvent
+    object OnPreviousPressed : HomeScreenEvent
     object DidNavigate : HomeScreenEvent
 }

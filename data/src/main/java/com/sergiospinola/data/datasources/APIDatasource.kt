@@ -5,6 +5,7 @@ import javax.inject.Inject
 
 class APIDatasource @Inject constructor(
     private val api: RickMortyAPI
-){
-    suspend fun getAllCharacters() = api.getAllCharacters()
+) {
+    suspend fun getAllCharacters(page: Int?) =
+        api.getAllCharacters(page)
 }
