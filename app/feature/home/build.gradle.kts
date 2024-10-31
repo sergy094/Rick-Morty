@@ -1,13 +1,14 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.sergiospinola.feature.home"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 28
@@ -48,5 +49,5 @@ dependencies {
 
     // Dagger/Hilt
     implementation(libs.bundles.hilt)
-    implementation(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 }

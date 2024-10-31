@@ -1,12 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.sergiospinola.rickmorty"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.sergiospinola.rickmorty"
@@ -51,10 +53,8 @@ dependencies {
 
     // Dagger/Hilt
     implementation(libs.bundles.hilt)
-    implementation(libs.hilt.compiler)
-    implementation(libs.compose.uiTooling)
+    ksp(libs.hilt.compiler)
 
-    // Dagger/Hilt
-    implementation(libs.bundles.hilt)
-    implementation(libs.hilt.compiler)
+    // Compose
+    implementation(libs.compose.uiTooling)
 }

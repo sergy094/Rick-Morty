@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -46,11 +48,11 @@ dependencies {
 
     // Dagger/Hilt
     implementation(libs.bundles.hilt)
-    implementation(libs.hilt.compiler)
-    implementation(libs.compose.accompanist)
-    implementation(libs.compose.uiTooling)
+    ksp(libs.hilt.compiler)
 
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
+    implementation(libs.compose.accompanist)
+    implementation(libs.compose.uiTooling)
 }

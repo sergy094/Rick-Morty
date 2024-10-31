@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.serialization)
     alias(libs.plugins.kotlin.parcelize)
 }
@@ -45,5 +47,5 @@ dependencies {
 
     // Dagger/Hilt
     implementation(libs.bundles.hilt)
-    implementation(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 }
