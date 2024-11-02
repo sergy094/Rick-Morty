@@ -35,6 +35,8 @@ okhttp-bom  = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhtt
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "retrofit" }
 okhttp-log  = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "retrofit" }
 
+io-coil-compose = "io.coil-kt:coil-compose:2.7.0"
+
 compose-activity = "androidx.activity:activity-compose:1.9.3"
 compose-bom = "androidx.compose:compose-bom:2024.10.01"
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }

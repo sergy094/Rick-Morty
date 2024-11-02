@@ -56,4 +56,7 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.compose.accompanist)
     implementation(libs.compose.uiTooling)
+
+    // IO
+    implementation(libs.io.coil.compose)
 }
