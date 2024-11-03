@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.sergiospinola.feature.home.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +23,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
@@ -35,10 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,7 +48,9 @@ import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
+import com.sergiospinola.common.R
 import com.sergiospinola.common.designsystem.component.Loader
+import com.sergiospinola.common.designsystem.component.searchbar.SearchBarCustom
 import com.sergiospinola.common.designsystem.theme.Blue
 import com.sergiospinola.common.designsystem.theme.Green
 import com.sergiospinola.common.designsystem.theme.HeadlineSmall
@@ -59,7 +61,6 @@ import com.sergiospinola.common.designsystem.theme.spacingXS
 import com.sergiospinola.data.model.CharacterListData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
 
 @Composable
 fun HomeScreen(
@@ -86,7 +87,6 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(
                     PaddingValues(
-                        top = padding.calculateTopPadding(),
                         bottom = padding.calculateBottomPadding()
                     )
                 )
@@ -104,54 +104,73 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
+                    Spacer(modifier = Modifier.height(spacingXS()))
                     Image(
-                        painter = painterResource(com.sergiospinola.common.R.drawable.rick_and_morty),
+                        painter = painterResource(R.drawable.logo_img),
                         contentDescription = ""
                     )
-                    Spacer(modifier = Modifier.height(spacingL()))
+                }
+                stickyHeader {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = spacingXS())
+                    ) {
+                        if (uiState.previousPage != null) {
+                            IconButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        listState.scrollToItem(0)
+                                    }
+                                    viewModel.handle(HomeScreenEvent.OnPreviousPressed)
+                                },
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .background(Color.Black),
+                                    painter = painterResource(id = R.drawable.ic_arrow_circle_left),
+                                    contentDescription = "",
+                                    colorFilter = ColorFilter.tint(Color.White)
+                                )
+                            }
+                        }
+                        Spacer(
+                            modifier = Modifier.width(spacingXS())
+                        )
+                        // TODO: configure search and filters
+                        SearchBarCustom(
+                            query = "",
+                            onQueryChange = {},
+                            modifier = Modifier.weight(1f)
+
+                        )
+                        Spacer(
+                            modifier = Modifier.width(spacingXS())
+                        )
+                        if (uiState.nextPage != null) {
+                            IconButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        listState.scrollToItem(0)
+                                    }
+                                    viewModel.handle(HomeScreenEvent.OnNextPressed)
+                                },
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .background(Color.Black),
+                                    painter = painterResource(id = R.drawable.ic_arrow_circle_right),
+                                    contentDescription = "",
+                                    colorFilter = ColorFilter.tint(Color.White)
+                                )
+                            }
+                        }
+                    }
                 }
                 items(uiState.characters.size) { index ->
                     CharacterCardComponent(uiState.characters[index])
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                if (uiState.previousPage != null) {
-                    IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                listState.scrollToItem(0)
-                            }
-                            viewModel.handle(HomeScreenEvent.OnPreviousPressed)
-                        }
-                    ) {
-                        Image(
-                            painter = painterResource(com.sergiospinola.common.R.drawable.ic_arrow_circle_left),
-                            contentDescription = "",
-                            Modifier.background(Color.White)
-                        )
-                    }
-                }
-                Spacer(
-                    modifier = Modifier.weight(1f)
-                )
-                if (uiState.nextPage != null) {
-                    IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                listState.scrollToItem(0)
-                            }
-                            viewModel.handle(HomeScreenEvent.OnNextPressed)
-                        }
-                    ) {
-                        Image(
-                            painter = painterResource(com.sergiospinola.common.R.drawable.ic_arrow_circle_right),
-                            contentDescription = "",
-                            Modifier.background(Color.White)
-                        )
-                    }
                 }
             }
         }
@@ -191,6 +210,7 @@ private fun CharacterCardComponent(character: CharacterListData) {
                         .size(Size.ORIGINAL)
                         .build(),
                     contentDescription = "",
+                    placeholder = painterResource(id = R.drawable.empty_avatar_img)
                 )
                 Spacer(modifier = Modifier.width(spacingM()))
                 Text(
@@ -214,15 +234,17 @@ private fun HomeScreenPreview() {
 private val composePreviewViewModel by lazy {
     object : HomeScreenViewModelInterface {
         // Outputs
-        override val homeScreenUiState = MutableStateFlow(HomeScreenUiState(
-            characters = listOf(
-                CharacterListData(
-                    id = 1,
-                    name = "Rick Sanchez",
-                    image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg"
-                ),
+        override val homeScreenUiState = MutableStateFlow(
+            HomeScreenUiState(
+                characters = listOf(
+                    CharacterListData(
+                        id = 1,
+                        name = "Rick Sanchez",
+                        image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg"
+                    ),
+                )
             )
-        ))
+        )
         override val loading = MutableStateFlow(false)
         override val error = MutableStateFlow(null)
 
