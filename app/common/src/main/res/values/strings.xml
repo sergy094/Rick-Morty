@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rick &amp; Morty: The encyclopedia</string>
+    <string name="common_error_text">An error occurred</string>
+    <string name="common_default_server_error_text">An error occurred in server</string>
+    <string name="common_loading_text">Loading</string>
+    <string name="common_accept_text">Accept</string>
+</resources>

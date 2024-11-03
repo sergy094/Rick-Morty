@@ -16,6 +16,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "API_URL", "\"https://rickandmortyapi.com/api/\"")
     }
 
     buildTypes {
@@ -26,6 +27,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+    buildFeatures {
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -48,4 +52,13 @@ dependencies {
     // Dagger/Hilt
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
+
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+
+    // OkHTTP
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp.core)
+    implementation(libs.okhttp.log)
 }
