@@ -8,4 +8,10 @@ class APIDatasource @Inject constructor(
 ) {
     suspend fun getAllCharacters(page: Int?) =
         api.getAllCharacters(page)
+
+    suspend fun getCharacter(characterId: Int) =
+        api.getCharacter(characterId)
+
+    suspend fun getEpisode(episodeId: String) =
+        api.getEpisode(episodeId)
 }

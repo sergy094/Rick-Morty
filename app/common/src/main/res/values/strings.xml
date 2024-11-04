@@ -5,4 +5,13 @@
     <string name="common_default_server_error_text">An error occurred in server</string>
     <string name="common_loading_text">Loading</string>
     <string name="common_accept_text">Accept</string>
+
+    <string name="detail_title_text">Character detail</string>
+    <string name="detail_status_text">Status</string>
+    <string name="detail_species_text">Species</string>
+    <string name="detail_type_text">Type</string>
+    <string name="detail_gender_text">Gender</string>
+    <string name="detail_origin_text">Origin</string>
+    <string name="detail_location_text">Location</string>
+    <string name="detail_episodes_text">Episodes</string>
 </resources>

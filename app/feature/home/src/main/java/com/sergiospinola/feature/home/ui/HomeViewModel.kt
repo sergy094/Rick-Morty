@@ -2,7 +2,7 @@ package com.sergiospinola.feature.home.ui
 
 import com.sergiospinola.common.base.BaseViewModel
 import com.sergiospinola.common.base.BaseViewModelInterface
-import com.sergiospinola.data.model.CharacterListData
+import com.sergiospinola.data.model.CharacterData
 import com.sergiospinola.data.repository.APIRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +32,7 @@ class HomeScreenViewModel @Inject constructor(
             HomeScreenEvent.DidNavigate -> didNavigate()
             HomeScreenEvent.OnNextPressed -> getCharacters(_homeScreenUiState.value.nextPage)
             HomeScreenEvent.OnPreviousPressed -> getCharacters(_homeScreenUiState.value.previousPage)
+            is HomeScreenEvent.OnCharacterPressed -> navigateToDetail(event.characterId)
         }
     }
 
@@ -59,6 +60,14 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
+    private fun navigateToDetail(characterId: Int) {
+        _homeScreenUiState.update {
+            it.copy(
+                navigation = HomeScreenNavigation.NavigateToDetail(characterId)
+            )
+        }
+    }
+
     private fun didNavigate() {
         if (_homeScreenUiState.value.navigation != null) {
             _homeScreenUiState.update {
@@ -71,16 +80,19 @@ class HomeScreenViewModel @Inject constructor(
 }
 
 data class HomeScreenUiState(
-    val characters: List<CharacterListData> = emptyList(),
+    val characters: List<CharacterData> = emptyList(),
     val nextPage: Int? = null,
     val previousPage: Int? = null,
     val navigation: HomeScreenNavigation? = null,
 )
 
-sealed interface HomeScreenNavigation {}
+sealed interface HomeScreenNavigation {
+    data class NavigateToDetail(val characterId: Int) : HomeScreenNavigation
+}
 
 sealed interface HomeScreenEvent {
     object OnNextPressed : HomeScreenEvent
     object OnPreviousPressed : HomeScreenEvent
+    data class OnCharacterPressed(val characterId: Int) : HomeScreenEvent
     object DidNavigate : HomeScreenEvent
 }

@@ -8,6 +8,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.sergiospinola.common.designsystem.theme.AppTheme
+import com.sergiospinola.feature.detail.navigation.detailScreen
+import com.sergiospinola.feature.detail.navigation.navigateToDetail
 import com.sergiospinola.feature.home.navigation.HOME_NAVIGATION_ROUTE
 import com.sergiospinola.feature.home.navigation.homeScreen
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +29,10 @@ fun MainCompose(
     ) {
         homeScreen(
             navController,
+            navController::navigateToDetail
+        )
+        detailScreen(
+            navController
         )
     }
 }
