@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -38,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,26 +58,29 @@ import com.sergiospinola.common.designsystem.component.searchbar.SearchBarCustom
 import com.sergiospinola.common.designsystem.theme.Blue
 import com.sergiospinola.common.designsystem.theme.Green
 import com.sergiospinola.common.designsystem.theme.HeadlineSmall
-import com.sergiospinola.common.designsystem.theme.spacingL
 import com.sergiospinola.common.designsystem.theme.spacingM
 import com.sergiospinola.common.designsystem.theme.spacingS
 import com.sergiospinola.common.designsystem.theme.spacingXS
-import com.sergiospinola.data.model.CharacterListData
+import com.sergiospinola.data.model.CharacterData
+import com.sergiospinola.data.model.CharacterGenderTypeData
+import com.sergiospinola.data.model.CharacterStatusTypeData
+import com.sergiospinola.data.model.LocationData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModelInterface = hiltViewModel<HomeScreenViewModel>(),
+    navigateToDetail: (Int) -> Unit
 ) {
     val uiState by viewModel.homeScreenUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.navigation) {
         when (val navigation = uiState.navigation) {
-            // TODO: include here all you navigations
-            //is HomeScreenNavigation.NavigateToDetail -> {
-            //    onNavigateToDetail(navigation.itemId)
-            //}
+            is HomeScreenNavigation.NavigateToDetail -> {
+                navigateToDetail(navigation.characterId)
+            }
+
             else -> {
                 // Does nothing
             }
@@ -82,12 +89,14 @@ fun HomeScreen(
     }
 
     Loader(viewModel = viewModel)
-    Scaffold { padding ->
+    Scaffold{ innerPadding ->
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         Column(
             modifier = Modifier
                 .padding(
                     PaddingValues(
-                        bottom = padding.calculateBottomPadding()
+                        top = innerPadding.calculateTopPadding() + statusBarPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding()
                     )
                 )
         ) {
@@ -170,7 +179,12 @@ fun HomeScreen(
                     }
                 }
                 items(uiState.characters.size) { index ->
-                    CharacterCardComponent(uiState.characters[index])
+                    CharacterCardComponent(
+                        character = uiState.characters[index],
+                        onClick = {
+                            viewModel.handle(HomeScreenEvent.OnCharacterPressed(uiState.characters[index].id))
+                        }
+                    )
                 }
             }
         }
@@ -178,14 +192,15 @@ fun HomeScreen(
 }
 
 @Composable
-private fun CharacterCardComponent(character: CharacterListData) {
+private fun CharacterCardComponent(character: CharacterData, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(50),
         border = BorderStroke(3.dp, Blue),
         colors = CardDefaults.cardColors(
             containerColor = Green
-        )
+        ),
+        onClick = onClick
     ) {
         Box(
             modifier = Modifier
@@ -199,7 +214,7 @@ private fun CharacterCardComponent(character: CharacterListData) {
             ) {
                 AsyncImage(
                     modifier = Modifier
-                        .size(100.dp)
+                        .size(dimensionResource(id = R.dimen.avatar_list_size))
                         .border(2.dp, Color.Black, CircleShape)
                         .clip(CircleShape),
                     model = ImageRequest.Builder(LocalContext.current)
@@ -227,7 +242,8 @@ private fun CharacterCardComponent(character: CharacterListData) {
 @Composable
 private fun HomeScreenPreview() {
     HomeScreen(
-        viewModel = composePreviewViewModel
+        viewModel = composePreviewViewModel,
+        navigateToDetail = {}
     )
 }
 
@@ -237,10 +253,25 @@ private val composePreviewViewModel by lazy {
         override val homeScreenUiState = MutableStateFlow(
             HomeScreenUiState(
                 characters = listOf(
-                    CharacterListData(
+                    CharacterData(
                         id = 1,
                         name = "Rick Sanchez",
-                        image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg"
+                        image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
+                        status = CharacterStatusTypeData.ALIVE,
+                        species = "Human",
+                        type = "",
+                        gender = CharacterGenderTypeData.MALE,
+                        origin = LocationData(
+                            name = "Earth (C-137)",
+                            url = "https://rickandmortyapi.com/api/location/1"
+                        ),
+                        location = LocationData(
+                            name = "Earth (Replacement Dimension)",
+                            url = "https://rickandmortyapi.com/api/location/20"
+                        ),
+                        episode = listOf(),
+                        url = "https://rickandmortyapi.com/api/character/1",
+                        created = ""
                     ),
                 )
             )

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.sergiospinola.common"
+    namespace = "com.sergiospinola.feature.detail"
     compileSdk = 35
 
     defaultConfig {
@@ -38,6 +38,7 @@ android {
 dependencies {
 
     implementation(project(":data"))
+    implementation(project(":app:common"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -54,4 +55,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.compose.uiTooling)
+
+    // IO
+    implementation(libs.io.coil.compose)
 }

@@ -2,5 +2,5 @@ package com.sergiospinola.data.model
 
 data class CharacterListResponse (
     val info: CharacterInfoData,
-    val results: List<CharacterListData>
+    val results: List<CharacterData>
 )

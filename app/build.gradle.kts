@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":app:common"))
     implementation(project(":app:feature:home"))
+    implementation(project(":app:feature:detail"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

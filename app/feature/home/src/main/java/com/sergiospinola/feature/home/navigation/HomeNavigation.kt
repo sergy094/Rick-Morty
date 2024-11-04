@@ -7,14 +7,18 @@ import com.sergiospinola.feature.home.ui.HomeScreen
 
 const val HOME_NAVIGATION_ROUTE = "home_navigation_route"
 
-fun NavController.navigateToHomeNavigation() {
+fun NavController.navigateToHome() {
     this.navigate(HOME_NAVIGATION_ROUTE)
 }
 
 fun NavGraphBuilder.homeScreen(
     navController: NavController,
+    navigateToDetail: (Int) -> Unit
 ) {
     composable(HOME_NAVIGATION_ROUTE) {
-        HomeScreen()
+        HomeScreen(
+            navigateToDetail = navigateToDetail
+
+        )
     }
 }
