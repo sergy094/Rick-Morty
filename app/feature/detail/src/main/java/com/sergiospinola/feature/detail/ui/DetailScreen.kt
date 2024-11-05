@@ -3,7 +3,6 @@ package com.sergiospinola.feature.detail.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,9 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -27,7 +23,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +31,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,9 +55,9 @@ import com.sergiospinola.common.designsystem.theme.Blue
 import com.sergiospinola.common.designsystem.theme.BodyLarge
 import com.sergiospinola.common.designsystem.theme.BodyMedium
 import com.sergiospinola.common.designsystem.theme.BodySmall
-import com.sergiospinola.common.designsystem.theme.Green
 import com.sergiospinola.common.designsystem.theme.HeadlineLarge
 import com.sergiospinola.common.designsystem.theme.HeadlineSmall
+import com.sergiospinola.common.designsystem.theme.PrimaryColor
 import com.sergiospinola.common.designsystem.theme.spacingM
 import com.sergiospinola.common.designsystem.theme.spacingS
 import com.sergiospinola.common.designsystem.theme.spacingXS
@@ -124,7 +118,7 @@ fun DetailScreen(
                     )
                     .clip(RoundedCornerShape(30.dp))
                     .border(3.dp, Blue, RoundedCornerShape(30.dp))
-                    .background(Green)
+                    .background(PrimaryColor)
             ) {
                 LazyColumn(
                     modifier = Modifier

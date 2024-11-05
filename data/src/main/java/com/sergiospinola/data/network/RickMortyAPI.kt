@@ -13,13 +13,28 @@ interface RickMortyAPI {
         @Query("page") page: Int?
     ): CharacterListResponse
 
+    @GET("character/")
+    suspend fun getFilteredCharacters(
+        @Query("page") page: Int?,
+        @Query("name") name: String?,
+        @Query("status") status: String?,
+        @Query("species") species: String?,
+        @Query("type") type: String?,
+        @Query("gender") gender: String?
+    ): CharacterListResponse
+
     @GET("character/{characterId}")
     suspend fun getCharacter(
         @Path("characterId") characterId: Int
     ): CharacterData
 
     @GET("episode/{episodeIds}")
-    suspend fun getEpisode(
+    suspend fun getEpisodes(
         @Path("episodeIds") episodeIds: String
     ): List<EpisodeData>
+
+    @GET("episode/{episodeIds}")
+    suspend fun getEpisode(
+        @Path("episodeIds") episodeIds: String
+    ): EpisodeData
 }

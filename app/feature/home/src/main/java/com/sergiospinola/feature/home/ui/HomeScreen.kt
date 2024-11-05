@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
 package com.sergiospinola.feature.home.ui
 
@@ -26,24 +26,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedIconToggleButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -60,11 +61,15 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.sergiospinola.common.R
 import com.sergiospinola.common.designsystem.component.Loader
+import com.sergiospinola.common.designsystem.component.buttons.CustomToggleButton
 import com.sergiospinola.common.designsystem.component.buttons.PrimaryButton
+import com.sergiospinola.common.designsystem.component.buttons.PrimaryOutlinedButton
+import com.sergiospinola.common.designsystem.component.dropdown.CustomDropDownMenu
+import com.sergiospinola.common.designsystem.component.dropdown.NO_SELECTION
 import com.sergiospinola.common.designsystem.theme.BackgroundAppColor
 import com.sergiospinola.common.designsystem.theme.Blue
-import com.sergiospinola.common.designsystem.theme.Green
 import com.sergiospinola.common.designsystem.theme.HeadlineSmall
+import com.sergiospinola.common.designsystem.theme.PrimaryColor
 import com.sergiospinola.common.designsystem.theme.spacingM
 import com.sergiospinola.common.designsystem.theme.spacingS
 import com.sergiospinola.common.designsystem.theme.spacingXS
@@ -109,7 +114,7 @@ fun HomeScreen(
         ) {
             val listState = rememberLazyListState()
             val coroutineScope = rememberCoroutineScope()
-            var filterChecked by remember { mutableStateOf(false) }
+            val filterChecked = remember { mutableStateOf(false) }
 
             LazyColumn(
                 state = listState,
@@ -128,182 +133,98 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(spacingXS()))
                 }
                 stickyHeader {
-                    Column(
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(BackgroundAppColor)
+                            .clip(GenericShape { size, _ ->
+                                lineTo(size.width, 0f)
+                                lineTo(size.width, Float.MAX_VALUE)
+                                lineTo(0f, Float.MAX_VALUE)
+                            })
+                            .shadow(8.dp)
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = spacingS())
+                                .fillMaxSize()
+                                .background(BackgroundAppColor)
                         ) {
-                            if (uiState.previousPage != null) {
-                                IconButton(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            listState.scrollToItem(0)
-                                        }
-                                        viewModel.handle(HomeScreenEvent.OnPreviousPressed)
-                                    },
-                                ) {
-                                    Image(
-                                        modifier = Modifier
-                                            .size(100.dp)
-                                            .background(Color.Black),
-                                        painter = painterResource(id = R.drawable.ic_arrow_circle_left),
-                                        contentDescription = "",
-                                        colorFilter = ColorFilter.tint(Color.White)
-                                    )
-                                }
-                            }
-                            Spacer(
-                                modifier = Modifier.width(spacingXS())
-                            )
-                            OutlinedIconToggleButton(
-                                checked = filterChecked,
-                                onCheckedChange = { filterChecked = it },
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("Filter")
-                            }
-                            Spacer(
-                                modifier = Modifier.width(spacingXS())
-                            )
-                            if (uiState.nextPage != null) {
-                                IconButton(
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            listState.scrollToItem(0)
-                                        }
-                                        viewModel.handle(HomeScreenEvent.OnNextPressed)
-                                    },
-                                ) {
-                                    Image(
-                                        modifier = Modifier
-                                            .size(100.dp)
-                                            .background(Color.Black),
-                                        painter = painterResource(id = R.drawable.ic_arrow_circle_right),
-                                        contentDescription = "",
-                                        colorFilter = ColorFilter.tint(Color.White)
-                                    )
-                                }
-                            }
-                        }
-                        AnimatedVisibility(filterChecked) {
-                            Column(
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = spacingS())
+                                    .padding(vertical = spacingS())
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        modifier = Modifier.width(100.dp),
-                                        text = "Name"
-                                    )
-                                    TextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f)
-                                    )
+                                if (uiState.previousPage != null) {
+                                    IconButton(
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                listState.scrollToItem(0)
+                                            }
+                                            viewModel.handle(HomeScreenEvent.OnPreviousPressed)
+                                        },
+                                    ) {
+                                        Image(
+                                            modifier = Modifier
+                                                .size(100.dp)
+                                                .background(Color.Black),
+                                            painter = painterResource(id = R.drawable.ic_arrow_circle_left),
+                                            contentDescription = "",
+                                            colorFilter = ColorFilter.tint(Color.White)
+                                        )
+                                    }
                                 }
                                 Spacer(
-                                    modifier = Modifier.height(spacingXS())
+                                    modifier = Modifier.width(spacingXS())
                                 )
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        modifier = Modifier.width(100.dp),
-                                        text = "Status"
-                                    )
-                                    TextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f)
-                                    )
-                                }
+                                CustomToggleButton(
+                                    text = "Filter",
+                                    checked = filterChecked.value,
+                                    onCheckedChange = { filterChecked.value = it },
+                                    modifier = Modifier.weight(1f)
+                                )
                                 Spacer(
-                                    modifier = Modifier.height(spacingXS())
+                                    modifier = Modifier.width(spacingXS())
                                 )
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        modifier = Modifier.width(100.dp),
-                                        text = "Species"
-                                    )
-                                    TextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f)
-                                    )
+                                if (uiState.nextPage != null) {
+                                    IconButton(
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                listState.scrollToItem(0)
+                                            }
+                                            viewModel.handle(HomeScreenEvent.OnNextPressed)
+                                        },
+                                    ) {
+                                        Image(
+                                            modifier = Modifier
+                                                .size(100.dp)
+                                                .background(Color.Black),
+                                            painter = painterResource(id = R.drawable.ic_arrow_circle_right),
+                                            contentDescription = "",
+                                            colorFilter = ColorFilter.tint(Color.White)
+                                        )
+                                    }
                                 }
-                                Spacer(
-                                    modifier = Modifier.height(spacingXS())
-                                )
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        modifier = Modifier.width(100.dp),
-                                        text = "Type"
-                                    )
-                                    TextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f)
-                                    )
-                                }
-                                Spacer(
-                                    modifier = Modifier.height(spacingXS())
-                                )
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        modifier = Modifier.width(100.dp),
-                                        text = "Gender"
-                                    )
-                                    TextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f)
-                                    )
-                                }
-                                PrimaryButton(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = spacingS()),
-                                    text = "Aplicar",
-                                    onClick = {}
+                            }
+                            AnimatedVisibility(filterChecked.value) {
+                                FilterComponent(
+                                    uiState = uiState,
+                                    isExpanded = filterChecked,
+                                    onFilterChanged = { type, value ->
+                                        viewModel.handle(
+                                            HomeScreenEvent.OnFilterChanged(
+                                                type,
+                                                value
+                                            )
+                                        )
+                                    },
+                                    onApplyFilters = {
+                                        viewModel.handle(HomeScreenEvent.OnApplyFiltersPressed)
+                                    },
+                                    onClearFilters = {
+                                        viewModel.handle(HomeScreenEvent.OnClearFiltersPressed)
+                                    }
                                 )
                             }
                         }
                     }
-
                 }
                 items(uiState.characters.size) { index ->
                     CharacterCardComponent(
@@ -327,7 +248,7 @@ private fun CharacterCardComponent(character: CharacterData, onClick: () -> Unit
         shape = RoundedCornerShape(50),
         border = BorderStroke(3.dp, Blue),
         colors = CardDefaults.cardColors(
-            containerColor = Green
+            containerColor = PrimaryColor
         ),
         onClick = onClick
     ) {
@@ -361,6 +282,171 @@ private fun CharacterCardComponent(character: CharacterData, onClick: () -> Unit
                     text = character.name,
                     textAlign = TextAlign.Center,
                     style = HeadlineSmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterComponent(
+    uiState: HomeScreenUiState,
+    isExpanded: MutableState<Boolean>,
+    onFilterChanged: (FilterTypeUIModel, String) -> Unit,
+    onApplyFilters: () -> Unit,
+    onClearFilters: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(BackgroundAppColor)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacingS())
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.width(100.dp),
+                    text = "Name"
+                )
+                TextField(
+                    value = uiState.appliedFilters.name ?: "",
+                    onValueChange = { value ->
+                        onFilterChanged(FilterTypeUIModel.NAME, value)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
+            Spacer(
+                modifier = Modifier.height(spacingXS())
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.width(100.dp),
+                    text = "Status"
+                )
+                CustomDropDownMenu(
+                    values = CharacterStatusTypeData.entries.map { it.text },
+                    selectedIndex = uiState.appliedFilters.status?.ordinal
+                        ?: NO_SELECTION,
+                    onSelectionChange = { value ->
+                        onFilterChanged(
+                            FilterTypeUIModel.STATUS,
+                            CharacterStatusTypeData.entries[value].text
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
+            Spacer(
+                modifier = Modifier.height(spacingXS())
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.width(100.dp),
+                    text = "Species"
+                )
+                TextField(
+                    value = uiState.appliedFilters.species ?: "",
+                    onValueChange = { value ->
+                        onFilterChanged(FilterTypeUIModel.SPECIES, value)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
+            Spacer(
+                modifier = Modifier.height(spacingXS())
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.width(100.dp),
+                    text = "Type"
+                )
+                TextField(
+                    value = uiState.appliedFilters.type ?: "",
+                    onValueChange = { value ->
+                        onFilterChanged(FilterTypeUIModel.TYPE, value)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
+            Spacer(
+                modifier = Modifier.height(spacingXS())
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.width(100.dp),
+                    text = "Gender"
+                )
+                CustomDropDownMenu(
+                    values = CharacterGenderTypeData.entries.map { it.text },
+                    selectedIndex = uiState.appliedFilters.gender?.ordinal
+                        ?: NO_SELECTION,
+                    onSelectionChange = { value ->
+                        onFilterChanged(
+                            FilterTypeUIModel.GENDER,
+                            CharacterGenderTypeData.entries[value].text
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = spacingS()),
+            ) {
+                PrimaryOutlinedButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    text = "Clear",
+                    onClick = {
+                        onClearFilters()
+                    }
+                )
+                Spacer(modifier = Modifier.width(spacingS()))
+                PrimaryButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    text = "Apply",
+                    onClick = {
+                        isExpanded.value = false
+                        onApplyFilters()
+                    }
                 )
             }
         }
