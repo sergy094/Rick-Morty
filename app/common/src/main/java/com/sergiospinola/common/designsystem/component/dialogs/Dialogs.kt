@@ -22,7 +22,7 @@ fun ErrorDialog(
     InfoDialog(
         title = title,
         message = message,
-        primaryButton = button.ifEmpty { stringResource(id = R.string.common_accept_text) },
+        primaryButton = button.ifEmpty { stringResource(R.string.common_accept_text) },
         onPrimaryButtonClick = onButtonClick,
         onDismiss = onDismiss,
     )

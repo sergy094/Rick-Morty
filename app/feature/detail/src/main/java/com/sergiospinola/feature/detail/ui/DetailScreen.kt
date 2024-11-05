@@ -1,5 +1,6 @@
 package com.sergiospinola.feature.detail.ui
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,13 +52,15 @@ import coil.size.Size
 import com.sergiospinola.common.R
 import com.sergiospinola.common.designsystem.component.Loader
 import com.sergiospinola.common.designsystem.component.appbar.AppBar
-import com.sergiospinola.common.designsystem.theme.Blue
+import com.sergiospinola.common.designsystem.theme.Black
+import com.sergiospinola.common.designsystem.theme.SecondaryColor
 import com.sergiospinola.common.designsystem.theme.BodyLarge
 import com.sergiospinola.common.designsystem.theme.BodyMedium
 import com.sergiospinola.common.designsystem.theme.BodySmall
 import com.sergiospinola.common.designsystem.theme.HeadlineLarge
 import com.sergiospinola.common.designsystem.theme.HeadlineSmall
 import com.sergiospinola.common.designsystem.theme.PrimaryColor
+import com.sergiospinola.common.designsystem.theme.White
 import com.sergiospinola.common.designsystem.theme.spacingM
 import com.sergiospinola.common.designsystem.theme.spacingS
 import com.sergiospinola.common.designsystem.theme.spacingXS
@@ -73,6 +76,7 @@ fun DetailScreen(
     navigateBack: () -> Unit,
 ) {
     val uiState by viewModel.detailUiState.collectAsStateWithLifecycle()
+    val mMediaPlayer = MediaPlayer.create(LocalContext.current, R.raw.rick_burp)
 
     LaunchedEffect(uiState.navigation) {
         when (val navigation = uiState.navigation) {
@@ -85,6 +89,12 @@ fun DetailScreen(
             }
         }
         viewModel.handle(DetailEvent.DidNavigate)
+    }
+
+    LaunchedEffect(uiState.mustPlayEasterEgg) {
+        if (uiState.mustPlayEasterEgg) {
+            mMediaPlayer.start()
+        }
     }
 
     Loader(viewModel)
@@ -116,8 +126,8 @@ fun DetailScreen(
                         start = spacingM(),
                         end = spacingM()
                     )
-                    .clip(RoundedCornerShape(30.dp))
-                    .border(3.dp, Blue, RoundedCornerShape(30.dp))
+                    .clip(RoundedCornerShape(10))
+                    .border(2.dp, SecondaryColor, RoundedCornerShape(10))
                     .background(PrimaryColor)
             ) {
                 LazyColumn(
@@ -134,7 +144,15 @@ fun DetailScreen(
                             AsyncImage(
                                 modifier = Modifier
                                     .size(dimensionResource(id = R.dimen.avatar_detail_size))
-                                    .border(2.dp, Color.Black, RectangleShape),
+                                    .border(2.dp, SecondaryColor, RectangleShape).then(
+                                        if (uiState.isEasterEggEnabled) {
+                                            Modifier.clickable {
+                                                viewModel.handle(DetailEvent.OnAvatarPressed)
+                                            }
+                                        } else {
+                                            Modifier
+                                        }
+                                    ),
                                 model = ImageRequest.Builder(LocalContext.current)
                                     .data(uiState.characterData?.image)
                                     .diskCachePolicy(CachePolicy.ENABLED)
@@ -192,8 +210,8 @@ fun DetailScreen(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .border(3.dp, Color.Black, RectangleShape)
-                                    .background(Color.White)
+                                    .border(2.dp, Black, RectangleShape)
+                                    .background(White)
                                     .padding(spacingS()),
                                 horizontalAlignment = Alignment.Start
                             ) {
@@ -233,18 +251,26 @@ private fun DetailField(
             thickness = 1.dp,
             color = Color.Black
         )
-        Text(
-            text = title,
-            style = HeadlineSmall,
-            color = Color.Gray
-        )
-        Spacer(modifier = Modifier.height(spacingXS()))
-        Text(
-            text = value,
-            style = BodyLarge,
-            color = Color.Black
-        )
-
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(2.dp, Color.Black, RectangleShape)
+                .background(Color.White)
+                .padding(spacingS()),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = title,
+                style = HeadlineSmall,
+                color = Color.Gray
+            )
+            Spacer(modifier = Modifier.height(spacingXS()))
+            Text(
+                text = value,
+                style = BodyLarge,
+                color = Color.Black
+            )
+        }
     }
 }
 

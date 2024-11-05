@@ -58,4 +58,5 @@ dependencies {
 
     // IO
     implementation(libs.io.coil.compose)
+    implementation(libs.io.coil.animated)
 }

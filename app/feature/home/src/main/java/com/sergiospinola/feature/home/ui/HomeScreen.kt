@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,15 +26,14 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -47,15 +47,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.ImageDecoderDecoder
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
@@ -64,19 +70,23 @@ import com.sergiospinola.common.designsystem.component.Loader
 import com.sergiospinola.common.designsystem.component.buttons.CustomToggleButton
 import com.sergiospinola.common.designsystem.component.buttons.PrimaryButton
 import com.sergiospinola.common.designsystem.component.buttons.PrimaryOutlinedButton
-import com.sergiospinola.common.designsystem.component.dropdown.CustomDropDownMenu
+import com.sergiospinola.common.designsystem.component.dropdown.CustomFilterDropDownMenu
 import com.sergiospinola.common.designsystem.component.dropdown.NO_SELECTION
+import com.sergiospinola.common.designsystem.component.textfield.CustomFilterOutlinedTextField
 import com.sergiospinola.common.designsystem.theme.BackgroundAppColor
-import com.sergiospinola.common.designsystem.theme.Blue
+import com.sergiospinola.common.designsystem.theme.Black
 import com.sergiospinola.common.designsystem.theme.HeadlineSmall
 import com.sergiospinola.common.designsystem.theme.PrimaryColor
+import com.sergiospinola.common.designsystem.theme.Red
+import com.sergiospinola.common.designsystem.theme.SecondaryColor
+import com.sergiospinola.common.designsystem.theme.spacingL
 import com.sergiospinola.common.designsystem.theme.spacingM
 import com.sergiospinola.common.designsystem.theme.spacingS
 import com.sergiospinola.common.designsystem.theme.spacingXS
 import com.sergiospinola.data.model.CharacterData
 import com.sergiospinola.data.model.CharacterGenderTypeData
 import com.sergiospinola.data.model.CharacterStatusTypeData
-import com.sergiospinola.data.model.LocationData
+import com.sergiospinola.feature.home.model.FilterUIModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -127,8 +137,9 @@ fun HomeScreen(
                 item {
                     Spacer(modifier = Modifier.height(spacingXS()))
                     Image(
+                        modifier = Modifier.width(200.dp),
                         painter = painterResource(R.drawable.logo_img),
-                        contentDescription = ""
+                        contentDescription = "",
                     )
                     Spacer(modifier = Modifier.height(spacingXS()))
                 }
@@ -152,24 +163,25 @@ fun HomeScreen(
                                     .fillMaxWidth()
                                     .padding(vertical = spacingS())
                             ) {
-                                if (uiState.previousPage != null) {
-                                    IconButton(
-                                        onClick = {
-                                            coroutineScope.launch {
-                                                listState.scrollToItem(0)
-                                            }
-                                            viewModel.handle(HomeScreenEvent.OnPreviousPressed)
-                                        },
-                                    ) {
-                                        Image(
-                                            modifier = Modifier
-                                                .size(100.dp)
-                                                .background(Color.Black),
-                                            painter = painterResource(id = R.drawable.ic_arrow_circle_left),
-                                            contentDescription = "",
-                                            colorFilter = ColorFilter.tint(Color.White)
-                                        )
-                                    }
+                                IconButton(
+                                    enabled = uiState.previousPage != null,
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            listState.scrollToItem(0)
+                                        }
+                                        viewModel.handle(HomeScreenEvent.OnPreviousPressed)
+                                    },
+                                ) {
+                                    Image(
+                                        modifier = Modifier.fillMaxSize(),
+                                        painter = painterResource(id = R.drawable.ic_arrow_circle_left),
+                                        contentDescription = "",
+                                        colorFilter = if (uiState.previousPage != null) {
+                                            ColorFilter.tint(Black)
+                                        } else {
+                                            ColorFilter.tint(Color.Transparent)
+                                        }
+                                    )
                                 }
                                 Spacer(
                                     modifier = Modifier.width(spacingXS())
@@ -183,24 +195,25 @@ fun HomeScreen(
                                 Spacer(
                                     modifier = Modifier.width(spacingXS())
                                 )
-                                if (uiState.nextPage != null) {
-                                    IconButton(
-                                        onClick = {
-                                            coroutineScope.launch {
-                                                listState.scrollToItem(0)
-                                            }
-                                            viewModel.handle(HomeScreenEvent.OnNextPressed)
-                                        },
-                                    ) {
-                                        Image(
-                                            modifier = Modifier
-                                                .size(100.dp)
-                                                .background(Color.Black),
-                                            painter = painterResource(id = R.drawable.ic_arrow_circle_right),
-                                            contentDescription = "",
-                                            colorFilter = ColorFilter.tint(Color.White)
-                                        )
-                                    }
+                                IconButton(
+                                    enabled = uiState.nextPage != null,
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            listState.scrollToItem(0)
+                                        }
+                                        viewModel.handle(HomeScreenEvent.OnNextPressed)
+                                    },
+                                ) {
+                                    Image(
+                                        modifier = Modifier.fillMaxSize(),
+                                        painter = painterResource(id = R.drawable.ic_arrow_circle_right),
+                                        contentDescription = "",
+                                        colorFilter = if (uiState.nextPage != null) {
+                                            ColorFilter.tint(Black)
+                                        } else {
+                                            ColorFilter.tint(Color.Transparent)
+                                        }
+                                    )
                                 }
                             }
                             AnimatedVisibility(filterChecked.value) {
@@ -226,13 +239,27 @@ fun HomeScreen(
                         }
                     }
                 }
-                items(uiState.characters.size) { index ->
-                    CharacterCardComponent(
-                        character = uiState.characters[index],
-                        onClick = {
-                            viewModel.handle(HomeScreenEvent.OnCharacterPressed(uiState.characters[index].id))
+                if (uiState.characters.isEmpty()
+                    && uiState.appliedFilters.hasFilterApplied()
+                ) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(spacingL())
+                        ) {
+                            EmptyFilteredCharacters()
                         }
-                    )
+                    }
+                } else {
+                    items(uiState.characters.size) { index ->
+                        CharacterCardComponent(
+                            character = uiState.characters[index],
+                            onClick = {
+                                viewModel.handle(HomeScreenEvent.OnCharacterPressed(uiState.characters[index].id))
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -245,8 +272,8 @@ private fun CharacterCardComponent(character: CharacterData, onClick: () -> Unit
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = spacingS()),
-        shape = RoundedCornerShape(50),
-        border = BorderStroke(3.dp, Blue),
+        shape = RoundedCornerShape(25),
+        border = BorderStroke(2.dp, SecondaryColor),
         colors = CardDefaults.cardColors(
             containerColor = PrimaryColor
         ),
@@ -265,8 +292,8 @@ private fun CharacterCardComponent(character: CharacterData, onClick: () -> Unit
                 AsyncImage(
                     modifier = Modifier
                         .size(dimensionResource(id = R.dimen.avatar_list_size))
-                        .border(2.dp, Color.Black, CircleShape)
-                        .clip(CircleShape),
+                        .border(2.dp, SecondaryColor, RoundedCornerShape(25))
+                        .clip(RoundedCornerShape(25)),
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(character.image)
                         .diskCachePolicy(CachePolicy.ENABLED)
@@ -296,6 +323,8 @@ private fun FilterComponent(
     onApplyFilters: () -> Unit,
     onClearFilters: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -306,123 +335,75 @@ private fun FilterComponent(
                 .fillMaxWidth()
                 .padding(spacingS())
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier.width(100.dp),
-                    text = "Name"
-                )
-                TextField(
-                    value = uiState.appliedFilters.name ?: "",
-                    onValueChange = { value ->
-                        onFilterChanged(FilterTypeUIModel.NAME, value)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-            }
+            CustomFilterOutlinedTextField(
+                textTitle = stringResource(R.string.filter_name_text),
+                fieldValue = uiState.appliedFilters.name ?: "",
+                fieldOnValueChange = { value ->
+                    onFilterChanged(FilterTypeUIModel.NAME, value)
+                },
+                fieldKeyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus() },
+                    onNext = { focusManager.clearFocus() }
+                ),
+            )
             Spacer(
                 modifier = Modifier.height(spacingXS())
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier.width(100.dp),
-                    text = "Status"
-                )
-                CustomDropDownMenu(
-                    values = CharacterStatusTypeData.entries.map { it.text },
-                    selectedIndex = uiState.appliedFilters.status?.ordinal
-                        ?: NO_SELECTION,
-                    onSelectionChange = { value ->
-                        onFilterChanged(
-                            FilterTypeUIModel.STATUS,
-                            CharacterStatusTypeData.entries[value].text
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-            }
+            CustomFilterDropDownMenu(
+                textTitle = stringResource(R.string.filter_status_text),
+                fieldValues = CharacterStatusTypeData.entries.map { it.text },
+                fieldSelectedIndex = uiState.appliedFilters.status?.ordinal
+                    ?: NO_SELECTION,
+                fieldOnSelectionChanged = { value ->
+                    onFilterChanged(
+                        FilterTypeUIModel.STATUS,
+                        CharacterStatusTypeData.entries[value].text
+                    )
+                },
+            )
             Spacer(
                 modifier = Modifier.height(spacingXS())
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier.width(100.dp),
-                    text = "Species"
-                )
-                TextField(
-                    value = uiState.appliedFilters.species ?: "",
-                    onValueChange = { value ->
-                        onFilterChanged(FilterTypeUIModel.SPECIES, value)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-            }
+            CustomFilterOutlinedTextField(
+                textTitle = stringResource(R.string.filter_species_text),
+                fieldValue = uiState.appliedFilters.species ?: "",
+                fieldOnValueChange = { value ->
+                    onFilterChanged(FilterTypeUIModel.SPECIES, value)
+                },
+                fieldKeyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus() },
+                    onNext = { focusManager.clearFocus() }
+                ),
+            )
             Spacer(
                 modifier = Modifier.height(spacingXS())
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier.width(100.dp),
-                    text = "Type"
-                )
-                TextField(
-                    value = uiState.appliedFilters.type ?: "",
-                    onValueChange = { value ->
-                        onFilterChanged(FilterTypeUIModel.TYPE, value)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-            }
+            CustomFilterOutlinedTextField(
+                textTitle = stringResource(R.string.filter_type_text),
+                fieldValue = uiState.appliedFilters.type ?: "",
+                fieldOnValueChange = { value ->
+                    onFilterChanged(FilterTypeUIModel.TYPE, value)
+                },
+                fieldKeyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus() },
+                    onNext = { focusManager.clearFocus() }
+                ),
+            )
             Spacer(
                 modifier = Modifier.height(spacingXS())
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier.width(100.dp),
-                    text = "Gender"
-                )
-                CustomDropDownMenu(
-                    values = CharacterGenderTypeData.entries.map { it.text },
-                    selectedIndex = uiState.appliedFilters.gender?.ordinal
-                        ?: NO_SELECTION,
-                    onSelectionChange = { value ->
-                        onFilterChanged(
-                            FilterTypeUIModel.GENDER,
-                            CharacterGenderTypeData.entries[value].text
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                )
-            }
+            CustomFilterDropDownMenu(
+                textTitle = stringResource(R.string.filter_gender_text),
+                fieldValues = CharacterGenderTypeData.entries.map { it.text },
+                fieldSelectedIndex = uiState.appliedFilters.gender?.ordinal
+                    ?: NO_SELECTION,
+                fieldOnSelectionChanged = { value ->
+                    onFilterChanged(
+                        FilterTypeUIModel.GENDER,
+                        CharacterGenderTypeData.entries[value].text
+                    )
+                },
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -432,7 +413,8 @@ private fun FilterComponent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    text = "Clear",
+                    text = stringResource(R.string.filter_clear_text),
+                    color = Red,
                     onClick = {
                         onClearFilters()
                     }
@@ -442,7 +424,7 @@ private fun FilterComponent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    text = "Apply",
+                    text = stringResource(R.string.filter_apply_text),
                     onClick = {
                         isExpanded.value = false
                         onApplyFilters()
@@ -451,6 +433,54 @@ private fun FilterComponent(
             }
         }
     }
+}
+
+@Composable
+fun EmptyFilteredCharacters() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacingS()),
+        shape = RoundedCornerShape(25),
+        border = BorderStroke(2.dp, SecondaryColor),
+        colors = CardDefaults.cardColors(
+            containerColor = PrimaryColor
+        )
+    ) {
+        val context = LocalContext.current
+
+        Column(
+            modifier = Modifier
+                .padding(horizontal = spacingM(), vertical = spacingM())
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.filter_no_results_text),
+                textAlign = TextAlign.Center,
+                style = HeadlineSmall
+            )
+            Spacer(modifier = Modifier.height(spacingS()))
+            Image(
+                modifier = Modifier
+                    .border(2.dp, SecondaryColor, RoundedCornerShape(25))
+                    .clip(RoundedCornerShape(25)),
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(context).data(data = R.drawable.dancing_rick_gif).apply(
+                        block = {
+                            size(Size.ORIGINAL)
+                        }).build(),
+                    imageLoader = ImageLoader.Builder(context)
+                        .components {
+                            add(ImageDecoderDecoder.Factory())
+                        }
+                        .build()
+                ),
+                contentDescription = null
+            )
+        }
+    }
+
 }
 
 @Preview
@@ -462,33 +492,47 @@ private fun HomeScreenPreview() {
     )
 }
 
+@Preview
+@Composable
+private fun FilterComponentPreview() {
+    FilterComponent(
+        uiState = HomeScreenUiState(),
+        isExpanded = remember { mutableStateOf(true) },
+        onFilterChanged = { _, _ -> },
+        onApplyFilters = {},
+        onClearFilters = {}
+    )
+}
+
 private val composePreviewViewModel by lazy {
     object : HomeScreenViewModelInterface {
         // Outputs
         override val homeScreenUiState = MutableStateFlow(
             HomeScreenUiState(
-                characters = listOf(
-                    CharacterData(
-                        id = 1,
-                        name = "Rick Sanchez",
-                        image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
-                        status = CharacterStatusTypeData.ALIVE,
-                        species = "Human",
-                        type = "",
-                        gender = CharacterGenderTypeData.MALE,
-                        origin = LocationData(
-                            name = "Earth (C-137)",
-                            url = "https://rickandmortyapi.com/api/location/1"
-                        ),
-                        location = LocationData(
-                            name = "Earth (Replacement Dimension)",
-                            url = "https://rickandmortyapi.com/api/location/20"
-                        ),
-                        episode = listOf(),
-                        url = "https://rickandmortyapi.com/api/character/1",
-                        created = ""
-                    ),
-                )
+                characters = emptyList(),
+                appliedFilters = FilterUIModel(name = "Rick")
+//                characters = listOf(
+//                    CharacterData(
+//                        id = 1,
+//                        name = "Rick Sanchez",
+//                        image = "https://rickandmortyapi.com/api/character/avatar/1.jpeg",
+//                        status = CharacterStatusTypeData.ALIVE,
+//                        species = "Human",
+//                        type = "",
+//                        gender = CharacterGenderTypeData.MALE,
+//                        origin = LocationData(
+//                            name = "Earth (C-137)",
+//                            url = "https://rickandmortyapi.com/api/location/1"
+//                        ),
+//                        location = LocationData(
+//                            name = "Earth (Replacement Dimension)",
+//                            url = "https://rickandmortyapi.com/api/location/20"
+//                        ),
+//                        episode = listOf(),
+//                        url = "https://rickandmortyapi.com/api/character/1",
+//                        created = ""
+//                    ),
+//                )
             )
         )
         override val loading = MutableStateFlow(false)

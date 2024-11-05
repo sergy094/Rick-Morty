@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sergiospinola.common.R
 import com.sergiospinola.common.designsystem.theme.AppTheme
+import com.sergiospinola.common.designsystem.theme.Black
 import com.sergiospinola.common.designsystem.theme.BodyMedium
 import com.sergiospinola.common.designsystem.theme.PrimaryColor
 import com.sergiospinola.common.designsystem.theme.SecondaryColor
@@ -61,7 +62,7 @@ fun PrimaryButton(
     val contentColor = if (isPressed) {
         PrimaryColor
     } else {
-        Color.White
+        Black
     }
 
     OutlinedButton(
@@ -156,11 +157,15 @@ fun CustomToggleButton(
         onCheckedChange = onCheckedChange,
         colors = IconButtonDefaults.outlinedIconToggleButtonColors(
             checkedContainerColor = PrimaryColor,
-            checkedContentColor = Color.White
+            checkedContentColor = Black
         ),
         modifier = modifier
     ) {
-        Text(text)
+        Text(
+            text.toUpperCase(Locale.current),
+            color = Black,
+            style = TitleMedium
+        )
     }
 }
 

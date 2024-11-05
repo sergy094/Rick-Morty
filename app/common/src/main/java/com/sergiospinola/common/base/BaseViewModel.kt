@@ -3,6 +3,7 @@ package com.sergiospinola.common.base
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sergiospinola.data.model.ErrorData
+import com.sergiospinola.data.network.factory.ErrorFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -39,7 +40,7 @@ open class BaseViewModel : ViewModel(), BaseViewModelInterface {
             job()
         } catch (throwable: Throwable) {
 
-            val error = ErrorData(throwable.message)
+            val error = ErrorFactory.buildError(throwable)
 
             if (showDefaultError) {
                 this.error.value = error

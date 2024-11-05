@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+const val RICK_ID = 1
+const val EASTER_EGG_COUNT = 5
+
 interface DetailViewModelInterface : BaseViewModelInterface {
     // Outputs
     val detailUiState: StateFlow<DetailUiState>
@@ -38,6 +41,7 @@ class DetailViewModel @Inject constructor(
         when (event) {
             DetailEvent.DidNavigate -> didNavigate()
             DetailEvent.OnBackPressed -> navigateBack()
+            DetailEvent.OnAvatarPressed -> increaseClickCount()
         }
     }
 
@@ -53,10 +57,37 @@ class DetailViewModel @Inject constructor(
                 _detailUiState.update {
                     it.copy(
                         characterData = character,
-                        episodesData = episodes
+                        episodesData = episodes,
+                        isEasterEggEnabled = characterId == RICK_ID,
                     )
                 }
             }
+        }
+    }
+
+    private fun increaseClickCount() {
+        val updatedCount = _detailUiState.value.clickCount + 1
+        if (updatedCount < EASTER_EGG_COUNT) {
+            _detailUiState.update {
+                it.copy(
+                    clickCount = updatedCount
+                )
+            }
+        } else {
+            playEasterEgg()
+            _detailUiState.update {
+                it.copy(
+                    clickCount = 0
+                )
+            }
+        }
+    }
+
+    private fun playEasterEgg() {
+        _detailUiState.update {
+            it.copy(
+                mustPlayEasterEgg = true
+            )
         }
     }
 
@@ -82,6 +113,9 @@ class DetailViewModel @Inject constructor(
 data class DetailUiState(
     val characterData: CharacterData? = null,
     val episodesData: List<EpisodeData>? = null,
+    val isEasterEggEnabled: Boolean = false,
+    val clickCount: Int = 0,
+    val mustPlayEasterEgg: Boolean = false,
     val navigation: DetailNavigation? = null,
 )
 
@@ -90,6 +124,7 @@ sealed interface DetailNavigation {
 }
 
 sealed interface DetailEvent {
+    object OnAvatarPressed : DetailEvent
     object OnBackPressed : DetailEvent
     object DidNavigate : DetailEvent
 }

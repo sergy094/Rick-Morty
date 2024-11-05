@@ -1,10 +1,13 @@
 package com.sergiospinola.feature.home.ui
 
+import android.util.Log
+import coil.network.HttpException
 import com.sergiospinola.common.base.BaseViewModel
 import com.sergiospinola.common.base.BaseViewModelInterface
 import com.sergiospinola.data.model.CharacterData
 import com.sergiospinola.data.model.CharacterGenderTypeData
 import com.sergiospinola.data.model.CharacterStatusTypeData
+import com.sergiospinola.data.network.constants.STATUS_NOT_FOUND
 import com.sergiospinola.data.repository.APIRepository
 import com.sergiospinola.feature.home.model.FilterUIModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,13 +43,15 @@ class HomeScreenViewModel @Inject constructor(
                     getCharacters(_homeScreenUiState.value.nextPage)
                 }
             }
+
             is HomeScreenEvent.OnPreviousPressed -> {
                 if (_homeScreenUiState.value.appliedFilters.hasFilterApplied()) {
                     getFilteredCharacters(_homeScreenUiState.value.previousPage)
                 } else {
-                getCharacters(_homeScreenUiState.value.previousPage)
-                    }
+                    getCharacters(_homeScreenUiState.value.previousPage)
+                }
             }
+
             is HomeScreenEvent.OnCharacterPressed -> navigateToDetail(event.characterId)
             is HomeScreenEvent.OnFilterChanged -> updateFilter(event.filterType, event.filterValue)
             HomeScreenEvent.OnApplyFiltersPressed -> getFilteredCharacters()
@@ -79,7 +84,20 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun getFilteredCharacters(page: Int? = null) {
-        launchWithErrorWrapper {
+        launchWithErrorWrapper(
+            showDefaultError = false,
+            onError = { error ->
+                if (error.errorCode == STATUS_NOT_FOUND) {
+                    _homeScreenUiState.update {
+                        it.copy(
+                            characters = emptyList(),
+                            nextPage = null,
+                            previousPage = null
+                        )
+                    }
+                }
+            }
+        ) {
             val filteredCharactersResponse = repository.getFilteredCharacters(
                 page = page,
                 name = _homeScreenUiState.value.appliedFilters.name,
@@ -98,6 +116,7 @@ class HomeScreenViewModel @Inject constructor(
                     previousPage = previousPage
                 )
             }
+
         }
     }
 
@@ -202,7 +221,9 @@ sealed interface HomeScreenEvent {
     object OnNextPressed : HomeScreenEvent
     object OnPreviousPressed : HomeScreenEvent
     data class OnCharacterPressed(val characterId: Int) : HomeScreenEvent
-    data class OnFilterChanged(val filterType: FilterTypeUIModel, val filterValue: String) : HomeScreenEvent
+    data class OnFilterChanged(val filterType: FilterTypeUIModel, val filterValue: String) :
+        HomeScreenEvent
+
     object OnApplyFiltersPressed : HomeScreenEvent
     object OnClearFiltersPressed : HomeScreenEvent
     object DidNavigate : HomeScreenEvent

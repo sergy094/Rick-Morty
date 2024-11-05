@@ -48,16 +48,16 @@ fun Loader(
         }
     }
     isError?.let { error ->
-        val (title, message) = if (error.title.isNullOrBlank() && error.message.isNullOrBlank()) {
+        val (title, message) = if (error.title.isNullOrBlank() && error.errorMessage.isNullOrBlank()) {
             Pair(
-                stringResource(id = R.string.common_error_text),
-                stringResource(id = R.string.common_default_server_error_text)
+                stringResource(R.string.common_error_text),
+                stringResource(R.string.common_default_server_error_text)
             )
         } else {
-            val errorMessage = if (!error.message.isNullOrBlank()) {
-                error.message ?: ""
+            val errorMessage = if (!error.errorMessage.isNullOrBlank()) {
+                error.errorMessage ?: ""
             } else {
-                stringResource(id = R.string.common_default_server_error_text)
+                stringResource(R.string.common_default_server_error_text)
             }
             Pair(
                 stringResource(id = R.string.common_error_text),
