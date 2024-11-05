@@ -12,11 +12,26 @@ class APIRepository @Inject constructor(
     suspend fun getAllCharacters(page: Int? = null): CharacterListResponse =
         apiDatasource.getAllCharacters(page)
 
+    suspend fun getFilteredCharacters(
+        page: Int? = null,
+        name: String? = null,
+        status: String? = null,
+        species: String? = null,
+        type: String? = null,
+        gender: String? = null
+    ): CharacterListResponse =
+        apiDatasource.getFilteredCharacters(page, name, status, species, type, gender)
+
     suspend fun getCharacter(characterId: Int): CharacterData =
         apiDatasource.getCharacter(characterId)
 
     suspend fun getEpisode(episodesUrls: List<String>): List<EpisodeData> {
-        val episodesIds = episodesUrls.joinToString(",") { it.substringAfterLast("/") }
-        return apiDatasource.getEpisode(episodesIds)
+        return if (episodesUrls.size == 1) {
+            val episodeId = episodesUrls.first().substringAfterLast("/")
+            listOf(apiDatasource.getEpisode(episodeId))
+        } else {
+            val episodesIds = episodesUrls.joinToString(",") { it.substringAfterLast("/") }
+            apiDatasource.getEpisodes(episodesIds)
+        }
     }
 }

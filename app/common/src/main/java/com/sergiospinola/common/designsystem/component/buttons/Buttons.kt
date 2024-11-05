@@ -15,7 +15,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonDefaults.outlinedButtonColors
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedIconToggleButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -139,6 +141,26 @@ fun PrimaryOutlinedButton(
             color = color,
             style = TitleMedium
         )
+    }
+}
+
+@Composable
+fun CustomToggleButton(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedIconToggleButton(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        colors = IconButtonDefaults.outlinedIconToggleButtonColors(
+            checkedContainerColor = PrimaryColor,
+            checkedContentColor = Color.White
+        ),
+        modifier = modifier
+    ) {
+        Text(text)
     }
 }
 
