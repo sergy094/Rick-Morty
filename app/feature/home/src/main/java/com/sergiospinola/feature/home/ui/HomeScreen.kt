@@ -2,6 +2,7 @@
 
 package com.sergiospinola.feature.home.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -29,12 +30,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedIconToggleButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +60,8 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.sergiospinola.common.R
 import com.sergiospinola.common.designsystem.component.Loader
-import com.sergiospinola.common.designsystem.component.searchbar.SearchBarCustom
+import com.sergiospinola.common.designsystem.component.buttons.PrimaryButton
+import com.sergiospinola.common.designsystem.theme.BackgroundAppColor
 import com.sergiospinola.common.designsystem.theme.Blue
 import com.sergiospinola.common.designsystem.theme.Green
 import com.sergiospinola.common.designsystem.theme.HeadlineSmall
@@ -89,7 +96,7 @@ fun HomeScreen(
     }
 
     Loader(viewModel = viewModel)
-    Scaffold{ innerPadding ->
+    Scaffold { innerPadding ->
         val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
         Column(
             modifier = Modifier
@@ -102,12 +109,12 @@ fun HomeScreen(
         ) {
             val listState = rememberLazyListState()
             val coroutineScope = rememberCoroutineScope()
+            var filterChecked by remember { mutableStateOf(false) }
 
             LazyColumn(
                 state = listState,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = spacingS())
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(spacingXS()),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -118,65 +125,185 @@ fun HomeScreen(
                         painter = painterResource(R.drawable.logo_img),
                         contentDescription = ""
                     )
+                    Spacer(modifier = Modifier.height(spacingXS()))
                 }
                 stickyHeader {
-                    Row(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = spacingXS())
+                            .fillMaxSize()
+                            .background(BackgroundAppColor)
                     ) {
-                        if (uiState.previousPage != null) {
-                            IconButton(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        listState.scrollToItem(0)
-                                    }
-                                    viewModel.handle(HomeScreenEvent.OnPreviousPressed)
-                                },
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = spacingS())
+                        ) {
+                            if (uiState.previousPage != null) {
+                                IconButton(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            listState.scrollToItem(0)
+                                        }
+                                        viewModel.handle(HomeScreenEvent.OnPreviousPressed)
+                                    },
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .size(100.dp)
+                                            .background(Color.Black),
+                                        painter = painterResource(id = R.drawable.ic_arrow_circle_left),
+                                        contentDescription = "",
+                                        colorFilter = ColorFilter.tint(Color.White)
+                                    )
+                                }
+                            }
+                            Spacer(
+                                modifier = Modifier.width(spacingXS())
+                            )
+                            OutlinedIconToggleButton(
+                                checked = filterChecked,
+                                onCheckedChange = { filterChecked = it },
+                                modifier = Modifier.weight(1f)
                             ) {
-                                Image(
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                        .background(Color.Black),
-                                    painter = painterResource(id = R.drawable.ic_arrow_circle_left),
-                                    contentDescription = "",
-                                    colorFilter = ColorFilter.tint(Color.White)
-                                )
+                                Text("Filter")
+                            }
+                            Spacer(
+                                modifier = Modifier.width(spacingXS())
+                            )
+                            if (uiState.nextPage != null) {
+                                IconButton(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            listState.scrollToItem(0)
+                                        }
+                                        viewModel.handle(HomeScreenEvent.OnNextPressed)
+                                    },
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .size(100.dp)
+                                            .background(Color.Black),
+                                        painter = painterResource(id = R.drawable.ic_arrow_circle_right),
+                                        contentDescription = "",
+                                        colorFilter = ColorFilter.tint(Color.White)
+                                    )
+                                }
                             }
                         }
-                        Spacer(
-                            modifier = Modifier.width(spacingXS())
-                        )
-                        // TODO: configure search and filters
-                        SearchBarCustom(
-                            query = "",
-                            onQueryChange = {},
-                            modifier = Modifier.weight(1f)
-
-                        )
-                        Spacer(
-                            modifier = Modifier.width(spacingXS())
-                        )
-                        if (uiState.nextPage != null) {
-                            IconButton(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        listState.scrollToItem(0)
-                                    }
-                                    viewModel.handle(HomeScreenEvent.OnNextPressed)
-                                },
+                        AnimatedVisibility(filterChecked) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = spacingS())
                             ) {
-                                Image(
+                                Row(
                                     modifier = Modifier
-                                        .size(100.dp)
-                                        .background(Color.Black),
-                                    painter = painterResource(id = R.drawable.ic_arrow_circle_right),
-                                    contentDescription = "",
-                                    colorFilter = ColorFilter.tint(Color.White)
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        modifier = Modifier.width(100.dp),
+                                        text = "Name"
+                                    )
+                                    TextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f)
+                                    )
+                                }
+                                Spacer(
+                                    modifier = Modifier.height(spacingXS())
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        modifier = Modifier.width(100.dp),
+                                        text = "Status"
+                                    )
+                                    TextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f)
+                                    )
+                                }
+                                Spacer(
+                                    modifier = Modifier.height(spacingXS())
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        modifier = Modifier.width(100.dp),
+                                        text = "Species"
+                                    )
+                                    TextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f)
+                                    )
+                                }
+                                Spacer(
+                                    modifier = Modifier.height(spacingXS())
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        modifier = Modifier.width(100.dp),
+                                        text = "Type"
+                                    )
+                                    TextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f)
+                                    )
+                                }
+                                Spacer(
+                                    modifier = Modifier.height(spacingXS())
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        modifier = Modifier.width(100.dp),
+                                        text = "Gender"
+                                    )
+                                    TextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f)
+                                    )
+                                }
+                                PrimaryButton(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = spacingS()),
+                                    text = "Aplicar",
+                                    onClick = {}
                                 )
                             }
                         }
                     }
+
                 }
                 items(uiState.characters.size) { index ->
                     CharacterCardComponent(
@@ -194,7 +321,9 @@ fun HomeScreen(
 @Composable
 private fun CharacterCardComponent(character: CharacterData, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacingS()),
         shape = RoundedCornerShape(50),
         border = BorderStroke(3.dp, Blue),
         colors = CardDefaults.cardColors(
