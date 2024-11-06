@@ -27,7 +27,7 @@ fun AppBar(
         title = {
             title?.let {
                 Text(
-                    text = stringResource(id = title),
+                    text = stringResource(title),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
