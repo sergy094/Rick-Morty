@@ -42,6 +42,7 @@ class DetailViewModel @Inject constructor(
             DetailEvent.DidNavigate -> didNavigate()
             DetailEvent.OnBackPressed -> navigateBack()
             DetailEvent.OnAvatarPressed -> increaseClickCount()
+            DetailEvent.OnEasterEggPlayed -> resetEasterEgg()
         }
     }
 
@@ -91,6 +92,14 @@ class DetailViewModel @Inject constructor(
         }
     }
 
+    private fun resetEasterEgg() {
+        _detailUiState.update {
+            it.copy(
+                mustPlayEasterEgg = false
+            )
+        }
+    }
+
     private fun navigateBack() {
         _detailUiState.update {
             it.copy(
@@ -125,6 +134,7 @@ sealed interface DetailNavigation {
 
 sealed interface DetailEvent {
     object OnAvatarPressed : DetailEvent
+    object OnEasterEggPlayed : DetailEvent
     object OnBackPressed : DetailEvent
     object DidNavigate : DetailEvent
 }

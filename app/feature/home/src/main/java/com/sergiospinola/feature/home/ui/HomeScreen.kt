@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.GenericShape
@@ -131,17 +132,23 @@ fun HomeScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(spacingXS()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(spacingXS()))
-                    Image(
-                        modifier = Modifier.width(200.dp),
-                        painter = painterResource(R.drawable.logo_img),
-                        contentDescription = "",
-                    )
-                    Spacer(modifier = Modifier.height(spacingXS()))
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(spacingXS()))
+                        Image(
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .height(60.dp)
+                                .clip(RoundedCornerShape(15)),
+                            painter = painterResource(R.drawable.logo_img),
+                            contentDescription = "",
+                        )
+                        Spacer(modifier = Modifier.height(spacingXS()))
+                    }
                 }
                 stickyHeader {
                     Box(
@@ -253,12 +260,15 @@ fun HomeScreen(
                     }
                 } else {
                     items(uiState.characters.size) { index ->
-                        CharacterCardComponent(
-                            character = uiState.characters[index],
-                            onClick = {
-                                viewModel.handle(HomeScreenEvent.OnCharacterPressed(uiState.characters[index].id))
-                            }
-                        )
+                        Column {
+                            Spacer(modifier = Modifier.height(spacingS()))
+                            CharacterCardComponent(
+                                character = uiState.characters[index],
+                                onClick = {
+                                    viewModel.handle(HomeScreenEvent.OnCharacterPressed(uiState.characters[index].id))
+                                }
+                            )
+                        }
                     }
                 }
             }

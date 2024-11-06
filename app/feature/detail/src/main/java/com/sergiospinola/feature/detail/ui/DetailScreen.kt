@@ -57,6 +57,7 @@ import com.sergiospinola.common.designsystem.theme.SecondaryColor
 import com.sergiospinola.common.designsystem.theme.BodyLarge
 import com.sergiospinola.common.designsystem.theme.BodyMedium
 import com.sergiospinola.common.designsystem.theme.BodySmall
+import com.sergiospinola.common.designsystem.theme.Grey
 import com.sergiospinola.common.designsystem.theme.HeadlineLarge
 import com.sergiospinola.common.designsystem.theme.HeadlineSmall
 import com.sergiospinola.common.designsystem.theme.PrimaryColor
@@ -94,6 +95,7 @@ fun DetailScreen(
     LaunchedEffect(uiState.mustPlayEasterEgg) {
         if (uiState.mustPlayEasterEgg) {
             mMediaPlayer.start()
+            viewModel.handle(DetailEvent.OnEasterEggPlayed)
         }
     }
 
@@ -210,8 +212,9 @@ fun DetailScreen(
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .border(2.dp, Black, RectangleShape)
-                                    .background(White)
+                                    .clip(RoundedCornerShape(10))
+                                    .border(1.dp, Color.Black, RoundedCornerShape(10))
+                                    .background(Grey)
                                     .padding(spacingS()),
                                 horizontalAlignment = Alignment.Start
                             ) {
@@ -254,8 +257,9 @@ private fun DetailField(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(2.dp, Color.Black, RectangleShape)
-                .background(Color.White)
+                .clip(RoundedCornerShape(10))
+                .border(1.dp, Color.Black, RoundedCornerShape(10))
+                .background(Grey)
                 .padding(spacingS()),
             horizontalAlignment = Alignment.Start
         ) {
