@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rick &amp; Morty: The encyclopedia</string>
+    <string name="common_error_text">An error occurred</string>
+    <string name="common_default_server_error_text">An error occurred in server</string>
+    <string name="common_loading_text">Loading</string>
+    <string name="common_accept_text">Accept</string>
+
+    <string name="filter_title_text">Filters</string>
+    <string name="filter_name_text">Name</string>
+    <string name="filter_status_text">Status</string>
+    <string name="filter_species_text">Species</string>
+    <string name="filter_type_text">Type</string>
+    <string name="filter_gender_text">Gender</string>
+    <string name="filter_apply_text">Apply</string>
+    <string name="filter_clear_text">Clear</string>
+    <string name="filter_no_results_text">Damn it! The filters you applied have no results! But fear nothing, here you have a dancing Rick while you reset them!</string>
+
+    <string name="detail_title_text">Character detail</string>
+    <string name="detail_status_text">Status</string>
+    <string name="detail_species_text">Species</string>
+    <string name="detail_type_text">Type</string>
+    <string name="detail_gender_text">Gender</string>
+    <string name="detail_origin_text">Origin</string>
+    <string name="detail_location_text">Location</string>
+    <string name="detail_episodes_text">Episodes</string>
+</resources>
